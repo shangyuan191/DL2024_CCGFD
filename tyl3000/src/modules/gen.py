@@ -5,23 +5,31 @@ import torch_geometric
 class base_edage:
     def __init__(self):
         super().__init__()
-        self.pdist = nn.PairwiseDistance(p=2)
+        pass
+    def pairwise_euclidean_distances(self, x, dim=-1):
+        dist = torch.cdist(x, x) ** 2
+        return dist, x
+
+    def pairwise_poincare_distances(self, x, dim=-1):
+        x_norm = (x ** 2).sum(dim, keepdim=True)
+        x_norm = (x_norm.sqrt() - 1).relu() + 1
+        x = x / (x_norm * (1 + 1e-2))
+        x_norm = (x ** 2).sum(dim, keepdim=True)
+
+        pq = torch.cdist(x, x) ** 2
+        dist = torch.arccosh(1e-6 + 1 + 2 * pq / ((1 - x_norm) * (1 - x_norm.transpose(-1, -2)))) ** 2
+        return dist, x
+
     def forward(self, x, A_0=None):
         pass
     def reset_parameters(self):
         pass
 
-    def distance_calculation(self, X_hat):
-        return torch.norm(X_hat[:, None] - X_hat, dim=2, p=2)
-        #return self.pdist(X_hat, X_hat)
+class cDGM(base_edage):
+    # not done yet
+    def __init__(self, d_in):
+        super(cDGM, self).__init__()
 
-
-class cDGM(nn.Module):
-
-    def __init__(self, d_in: int, d_out: int = None):
-        super().__init__()
-
-        # define layers for f_{\Theta}
         #self.gcn_conv = GCNConv(d_in, 32)
         #self.mlp = MLP([d_in, 32], final_activation=True)
 
@@ -51,4 +59,17 @@ class cDGM(nn.Module):
 
         A = torch.sigmoid(self.t * (self.T - D))
         return A
+
+
+class dDGM(base_edage):
+    #not done yet
+    def __init__(self, d_in, k=5, distance="euclidean", sparse=True):
+        super(dDGM, self).__init__()
+        self.d_in = d_in
+        self.k = k
+
+        self.temperature = nn.Parameter(torch.tensor(1.).float())
+
+    def forward(self, X, A_0= None, fix_DGM=False):
+        pass
 
