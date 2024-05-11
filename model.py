@@ -10,10 +10,24 @@ class DiscriminatorGAT(nn.Module):
 
     def __init__(self, in_dim, out_dim):
         
-        self.ego_lin = nn.Sequential(OrderedDict[('ego_1', nn.Linear(in_dim, 64)), ('ego_2', nn.Linear(64, out_dim))])
-        self.gconv = nn.Sequential(OrderedDict[('neigh_1', GATConv(in_dim, 64)), ('neigh_2', GATConv(64, out_dim))])
+        super().__init__()
 
-    def forward(self, source, terget):
+        self.ego_lin = nn.Sequential(OrderedDict([
+                                                ('ego_1', nn.Linear(in_dim, 64)), 
+                                                ('ego_2', nn.Linear(64, out_dim))
+                                                ])
+                                    )
+        
+        self.gconv = nn.ModuleList([GATConv(in_dim, 64), 
+                                GATConv(64, out_dim)]
+                                    )
+
+    def forward(self, source, terget, edge_index):
+
+        source = self.ego_lin(source)
+
+        for m in self.gconv:
+            terget = m(terget, edge_index)
 
         sorce = nn.functional.cosine_similarity(source, terget)
 

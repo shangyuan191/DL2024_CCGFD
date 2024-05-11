@@ -47,6 +47,5 @@ class CreditCard(InMemoryDataset):
         src, dst = np.nonzero(mask)
         edge_index = np.stack([src, dst])
 
-
         data = Data(x=x, y=y, edge_index=edge_index)
         self.save([data], self.processed_paths[0])
