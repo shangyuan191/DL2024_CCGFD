@@ -27,7 +27,7 @@ class base_edage(nn.Module):
         pass
 
 class cDGM(base_edage):
-    #   20240511_v1 done
+    #   20240511_v2 done
     def __init__(self, embed_model, k=None, distance="euclidean"):
         super(cDGM, self).__init__()
         _input_dim = 4
@@ -60,7 +60,7 @@ class cDGM(base_edage):
 
 
 class dDGM(base_edage):
-    #   20240511_v1 done
+    #   20240511_v2 done
     def __init__(self, embed_model, k=5, distance="euclidean", sparse=True):
         super(dDGM, self).__init__()
         self.embed_model = embed_model
