@@ -71,8 +71,8 @@ class simple_attention(base_attention):
 
         return attn_output
 
-    def forward(self, query_input, source_input):
-        qs, ks, vs = self._input_feed_forward(query_input, source_input)
+    def forward(self, x, A=None):
+        qs, ks, vs = self._input_feed_forward(x, x)
         if self.output_attn:
             out, att = self.simple_attention(qs, ks, vs)
             return out, att
@@ -88,8 +88,8 @@ class torch_attention(base_attention):
         #Linux : Flash Attention
         self.MHA = nn.MultiheadAttention(out_channels, num_heads)
 
-    def forward(self, query_input, source_input):
-        qs, ks, vs = self._input_feed_forward(query_input, source_input)
+    def forward(self, x, A=None):
+        qs, ks, vs = self._input_feed_forward(x, x)
         out, att = self.MHA(qs, ks, vs)
         if self.output_attn:
             return out, att.mean(dim=0)
@@ -105,11 +105,11 @@ if __name__ == '__main__':
 
     simple_model = simple_attention(i_dim, o_dim, head, True).to("cuda")
 
-    simple_y = simple_model(x, x)
+    simple_y = simple_model(x)
     print(simple_y[0].shape, simple_y[1].shape)
 
     torch_model = torch_attention(i_dim, o_dim, head, True, 0.0).to("cuda")
-    torch_y = torch_model(x, x)
+    torch_y = torch_model(x)
     print(torch_y[0].shape, torch_y[1].shape)
 
 
