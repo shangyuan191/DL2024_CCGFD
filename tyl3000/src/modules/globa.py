@@ -92,8 +92,8 @@ class flash_attention(_attention):
     def forward(self, query_input, source_input):
         qs, ks, vs = self._input_feed_forward(query_input, source_input)
         #out = self.simple_attention(qs, ks, vs)
-        out = out.mean(dim=1)
-        return out
+        #out = out.mean(dim=1)
+        #return out
 
 
 
