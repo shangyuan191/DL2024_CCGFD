@@ -63,6 +63,7 @@ class simple_attention(base_attention):
         attention_normalizer = torch.unsqueeze(attention_normalizer, len(attention_normalizer.shape))  # [N, H, 1]
         attention_normalizer += torch.ones_like(attention_normalizer) * N
         attn_output = attention_num / attention_normalizer  # [N, H, D]
+        attn_output = attn_output.mean(dim=1)
 
         # compute attention for visualization if needed
         if self.output_attn:
@@ -92,8 +93,8 @@ class torch_attention(base_attention):
         qs, ks, vs = self._input_feed_forward(x, x)
         out, att = self.MHA(qs, ks, vs)
         if self.output_attn:
-            return out, att.mean(dim=0)
-        return out
+            return out.mean(dim=1), att.mean(dim=0)
+        return out.mean(dim=1)
 
 
 if __name__ == '__main__':
