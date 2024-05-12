@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch_geometric
+from torch_geometric.utils import *
 
 class base_edage(nn.Module):
     def __init__(self):
@@ -37,7 +37,7 @@ class cDGM(base_edage):
         self.t = nn.Parameter(torch.tensor(0.5))
 
         self.scale = nn.Parameter(torch.tensor(-1).float(),requires_grad=False)
-        self.centroid = nn.Parameter(torch.zeros((1,1,_input_dim)).float(),requires_grad=False)
+        self.centroid = nn.Parameter(torch.zeros((1, 1, _input_dim)).float(),requires_grad=False)
 
         if distance == 'euclidean':
             self.distance = self.pairwise_euclidean_distances
@@ -55,8 +55,9 @@ class cDGM(base_edage):
 
         D = self.distance((x - self.centroid) * self.scale)
         A = torch.sigmoid(self.t * (self.T.abs() - D))
+        edge_index, edge_att = dense_to_sparse(A)
 
-        return x, A, None
+        return x, edge_index, edge_att
 
 
 class dDGM(base_edage):
@@ -79,19 +80,22 @@ class dDGM(base_edage):
 
         soft_selection = F.softmax(gumbel_logits / self.T, dim=1)
         log_probs, indices = soft_selection.topk(self.k, dim=1)
-        edges = torch.zeros_like(logits).scatter_(1, indices, 1)
-        return edges, log_probs
+        edges = torch.zeros_like(logits).scatter_(1, indices, log_probs)
+        edge_index, edge_att = dense_to_sparse(edges)
 
-    def forward(self, x, A_0=None):
-        x = self.embed_model(x, A_0)
+        return edge_index, edge_att
+
+    def forward(self, x, edge_index=None):
+        x = self.embed_model(x, edge_index)
         with torch.set_grad_enabled(self.training):
             if type(x) == tuple and len(x) == 2:
                 x, D = x
             else:
                 D = self.distance(x)
-            edges_hat, log_probs = self.top_k_sample_dense(D)
+            edge_index, edge_att = self.top_k_sample_dense(D)
 
-        return x, edges_hat, log_probs
+
+        return x, edge_index, edge_att
 
 if __name__ == '__main__':
     from globa import *
@@ -107,7 +111,7 @@ if __name__ == '__main__':
 
     c_DGM = cDGM(simple_attention(i_dim, o_dim, head, True)).to("cuda")
     c_out, c_edges, c_probs = c_DGM(x, None)
-    print(x.shape, c_out.shape, c_edges.shape)
+    print(x.shape, c_out.shape, c_edges.shape, c_probs.shape)
 
 
     #simple_y = simple_model(x)

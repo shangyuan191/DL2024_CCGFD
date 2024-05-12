@@ -28,7 +28,6 @@ class base_attention(nn.Module):
         return query, key, value
 
     def forward(self, query_input, source_input):
-
         pass
 
     def reset_parameters(self):
@@ -36,7 +35,6 @@ class base_attention(nn.Module):
         self.Wq.reset_parameters()
         if self.use_weight:
             self.Wv.reset_parameters()
-
 
 class simple_attention(base_attention):
     """
@@ -79,7 +77,6 @@ class simple_attention(base_attention):
             return out, att
         out = self.simple_attention(qs, ks, vs)
         return out
-
 
 class torch_attention(base_attention):
     def __init__(self, in_channels, out_channels, num_heads, output_attn=True, dropout_p=0.0, feed_forward=nn.Linear, use_weight=True):

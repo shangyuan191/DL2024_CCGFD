@@ -1,10 +1,10 @@
 
-from moodle import *
+from . import *
 
 __all__ = ['gen',
            'globa',
            'mpnn',
-           'sample',
+           'block',
            'utils',
            'task_head',
            'extra_modules']
