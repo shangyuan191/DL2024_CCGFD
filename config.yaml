@@ -1,0 +1,18 @@
+{
+    # about train 
+    "n_layer" : 2,
+    "hidden_dim" : 64,
+    "out_dim" : 32,
+    "batch_size" : 64,
+    "total_epoch" : 1500,
+
+    # about loss
+    "lr" : 5e-4,
+    "weight_decay" : 0.0,
+    "alpha" : 0.3,
+    'gamma' : 0.4,
+
+    # other
+    "seed" : 42,
+    "ckpt_path":'./ckpt/creditcard.pkl'
+}

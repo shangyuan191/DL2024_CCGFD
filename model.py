@@ -22,14 +22,13 @@ class DiscriminatorGAT(nn.Module):
                                 GATConv(64, out_dim)]
                                     )
 
-    def forward(self, source, terget, edge_index):
+    def forward(self, x, edge_index):
 
-        source = self.ego_lin(source)
+        source = self.ego_lin(x)
 
         for m in self.gconv:
-            terget = m(terget, edge_index)
+            target = m(x, edge_index)
 
-        sorce = nn.functional.cosine_similarity(source, terget)
 
-        return -1 * sorce.unsqueeze(0)
+        return source, target
     
