@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch_geometric
 from torch.nn import Linear, ReLU, Dropout
-from torch_geometric.nn import SAGEConv, GATConv, GINEConv, GCNConv, Sequential
+from torch_geometric.nn import SAGEConv, GATConv, GINEConv, GCNConv, Sequential, summary
 from torch_geometric.utils import *
 import scipy.sparse as sp
 
@@ -26,16 +26,22 @@ class dgm_block(base_block):
             [
                 (d_DGM(att(i_dim, h_dim, head)), 'x, edge_index -> x, edge_index, edge_att'),
                 (ReLU(inplace=True), 'x -> x'),
-                (mpnn_model(h_dim, h_dim), 'x, edge_index -> x'),
-                (ReLU(inplace=True), 'x -> x'),
 
-                (d_DGM(mpnn_model(h_dim, h_dim)), 'x, edge_index -> x, edge_index, edge_att'),
-                (ReLU(inplace=True), 'x -> x'),
-                (mpnn_model(h_dim, h_dim), 'x, edge_index -> x'),
-                (ReLU(inplace=True), 'x -> x'),
+                (mpnn_model(h_dim, h_dim), 'x, edge_index -> x1'),
+                (ReLU(inplace=True), 'x1 -> x1'),
+                (self.res, 'x, x1 -> x'),
 
-                (d_DGM(mpnn_model(h_dim, h_dim)), 'x, edge_index -> x, edge_index, edge_att'),
-                (ReLU(inplace=True), 'x -> x'),
+
+                (d_DGM(mpnn_model(h_dim, h_dim)), 'x, edge_index -> x1, edge_index, edge_att'),
+                (ReLU(inplace=True), 'x1 -> x1'),
+                (self.res, 'x, x1 -> x'),
+                (mpnn_model(h_dim, h_dim), 'x, edge_index -> x1'),
+                (ReLU(inplace=True), 'x1 -> x1'),
+                (self.res, 'x, x1 -> x'),
+
+                (d_DGM(mpnn_model(h_dim, h_dim)), 'x, edge_index -> x1, edge_index, edge_att'),
+                (ReLU(inplace=True), 'x1 -> x1'),
+                (self.res, 'x, x1 -> x'),
                 (mpnn_model(h_dim, o_dim), 'x, edge_index -> x'),
             ]
         )
@@ -43,13 +49,17 @@ class dgm_block(base_block):
         self.a1 = d_DGM(att(i_dim, h_dim, head))
         self.a2 = mpnn_model(h_dim, o_dim)
 
+    def res(self, x1, x2):
+        return x1 + x2
+
+
     def forward(self, x, edge_index=None):
         x = self.block(x, edge_index)
         return x
 
 
 if __name__ == '__main__':
-    batch = 5000
+    batch = 3000
     i_dim = 512
     h_dim = 128
     o_dim = 64
