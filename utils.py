@@ -8,7 +8,7 @@ def rescale_cosine_sim(source, target):
 
     score = F.cosine_similarity(source, target)
 
-    return -1 * score.unsqueeze(0)
+    return (-1 * score.unsqueeze(0) + 1) / 2 + 1e-06
 
 
 

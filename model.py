@@ -27,8 +27,7 @@ class DiscriminatorGAT(nn.Module):
         source = self.ego_lin(x)
 
         for m in self.gconv:
-            target = m(x, edge_index)
+            x = m(x, edge_index)
 
-
-        return source, target
+        return source, x
     

@@ -14,5 +14,5 @@
 
     # other
     "seed" : 42,
-    "ckpt_path":'./ckpt/creditcard.pkl'
+    "ckpt_path":'./ckpt'
 }
