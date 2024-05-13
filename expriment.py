@@ -5,7 +5,7 @@ import argparse
 from data_utils import *
 from utils import rescale_cosine_sim, update_argparse
 from model import DiscriminatorGAT
-from train import train
+from train import train, eval
 
 
 parser = argparse.ArgumentParser(description="PREM-GAT")
@@ -23,6 +23,7 @@ if __name__ == "__main__":
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else'cpu')
     os.makedirs(args['ckpt_path'], exist_ok=True)
+    state_path = osp.join(args['ckpt_path'], f"creaditcard_cos{int(args['cos']*10)}.pkl")
 
 
     dataset = CreditCard(root='./dataset', cos=args['cos'])
@@ -38,5 +39,10 @@ if __name__ == "__main__":
     loss_function = torch.nn.BCELoss()
 
     stat = train(args, data, model, optimzer, loss_function,device)
+
+    model.load_state_dict(torch.load(state_path))
+    auc = eval(data, model, device)
+
+    stat["AUC"] = auc
 
     print(stat)

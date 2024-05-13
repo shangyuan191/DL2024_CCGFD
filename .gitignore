@@ -2,4 +2,4 @@ dataset
 creditcard.csv
 creditcard.npz
 __pycache__
-
+.gpickle

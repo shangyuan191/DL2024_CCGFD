@@ -1,6 +1,7 @@
 import os.path as osp
 import torch
 
+from sklearn.metrics import roc_auc_score
 from tqdm import tqdm
 from utils import *
 
@@ -12,7 +13,6 @@ def train(args, data, model, optim, loss_function, device):
     }
     
     state_path = osp.join(args['ckpt_path'], f"creaditcard_cos{int(args['cos']*10)}.pkl")
-    batch_size = args['batch_size']
 
     x = data.x.to(device)
     edge_index = data.edge_index.to(device)
@@ -55,3 +55,19 @@ def train(args, data, model, optim, loss_function, device):
         optim.step()
         
     return stats
+
+
+def eval(data, model, device):
+    model.eval()
+    with torch.no_grad():
+        x = data.x.to(device)
+        edge_index = data.edge_index.to(device)
+
+        x_mlp, x_gat = model(x, edge_index)
+
+        score_pos = rescale_cosine_sim(x_mlp, x_gat)
+
+        y_ture = data.y.detach().cpu()
+        y_pred = score_pos.squeeze().detach().cpu()
+        auc = roc_auc_score(y_ture, y_pred)
+    return auc
