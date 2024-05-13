@@ -3,9 +3,9 @@ import torch
 import argparse
 
 from data_utils import *
-from utils import *
-from model import *
-from train import *
+from utils import rescale_cosine_sim, update_argparse
+from model import DiscriminatorGAT
+from train import train
 
 
 parser = argparse.ArgumentParser(description="PREM-GAT")
@@ -31,7 +31,7 @@ if __name__ == "__main__":
     N = data.x.shape[0]
     num_feature = data.x.shape[1]
 
-    model = DiscriminatorGAT(in_dim=num_feature, out_dim= 32)
+    model = DiscriminatorGAT(in_dim=num_feature, out_dim= args['out_dim'], num_heads=args['num_heads'], n_layer=args['n_layer'], hidden_dim=args['hidden_dim'])
     model.to(device)
 
     optimzer = torch.optim.Adam(model.parameters())

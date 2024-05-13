@@ -5,6 +5,7 @@
     "out_dim" : 32,
     "batch_size" : 64,
     "total_epoch" : 1500,
+    "num_heads" : 4,
 
     # about loss
     "lr" : 5e-4,
