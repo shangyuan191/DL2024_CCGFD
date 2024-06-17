@@ -45,13 +45,29 @@ df_benign=data_standardization(df_benign)
 df_fraud=data_standardization(df_fraud)
 
 
-X=df_benign.drop(columns=['Class'])
-y=df_benign['Class']
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-test=pd.concat([X_test,y_test],axis=1)
-test=pd.concat([test,df_fraud],axis=0,ignore_index=True)
-X_test=test.drop(columns=['Class'])
-y_test=test['Class']
+# 合并两个数据集
+combined_data = pd.concat([df_fraud, df_benign])
+
+# 打乱数据
+combined_data = combined_data.sample(frac=1, random_state=42).reset_index(drop=True)
+
+# 切分数据为训练集和测试集，按 80:20 比例
+train_data, test_data = train_test_split(combined_data, test_size=0.2, random_state=42)
+
+# 提取特征和标签
+X_train = train_data.drop('Class', axis=1)
+y_train = train_data['Class']
+X_test = test_data.drop('Class', axis=1)
+y_test = test_data['Class']
+
+
+# X=df_benign.drop(columns=['Class'])
+# y=df_benign['Class']
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# test=pd.concat([X_test,y_test],axis=1)
+# test=pd.concat([test,df_fraud],axis=0,ignore_index=True)
+# X_test=test.drop(columns=['Class'])
+# y_test=test['Class']
 
 
 
