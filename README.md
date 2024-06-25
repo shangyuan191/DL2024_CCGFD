@@ -17,11 +17,11 @@
     mkdir graph_clear/train
     ```
 - 訓練資料中混入異常資料的實驗結果：
-```
-python main.py
-```
+    ```
+    python main.py
+    ```
 - 訓練資料中r僅有正常資料的實驗結果：
-```
-python main_clear.py
-```
+    ```
+    python main_clear.py
+    ```
 
