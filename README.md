@@ -20,7 +20,7 @@
     ```
     python main.py
     ```
-- 訓練資料中r僅有正常資料的實驗結果：
+- 訓練資料中僅有正常資料的實驗結果：
     ```
     python main_clear.py
     ```
