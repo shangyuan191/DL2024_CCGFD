@@ -5,7 +5,7 @@
 ## 兩種程式執行方式：
 ### 1. 使用Jupyer Notebook執行
 - 訓練資料中混入異常資料的實驗結果：main_mix.ipynb
-- 訓練資料中r僅有正常資料的實驗結果：main_clear.ipynb
+- 訓練資料中僅有正常資料的實驗結果：main_clear.ipynb
 ### 2. 執行python檔
 - 創建存放圖資料的資料夾
     ```
